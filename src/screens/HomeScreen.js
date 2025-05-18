@@ -3,6 +3,7 @@ import { View, FlatList, StyleSheet } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import BottomNavigation from '../components/BottomNavigation';
 import RecipeCard from '../components/RecipeCard';
+import {useNavigation} from "@react-navigation/native";
 
 //TODO TROCAR PARA BANCO
 const data = new Array(20).fill({
@@ -12,6 +13,9 @@ const data = new Array(20).fill({
 });
 
 export default function HomeScreen() {
+
+    const navigation = useNavigation();
+
     return (
 
         <View style={styles.container}>
@@ -28,7 +32,10 @@ export default function HomeScreen() {
                 numColumns={2}
                 contentContainerStyle={styles.list}
                 renderItem={({ item }) => (
-                    <RecipeCard item={item} />
+                    <RecipeCard
+                        item={item}
+                        onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}
+                    />
                 )}
             />
 

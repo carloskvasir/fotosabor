@@ -1,51 +1,63 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, TouchableOpacity, Dimensions, View } from 'react-native';
 import { Card, Text, Icon } from 'react-native-elements';
 
-const RecipeCard = ({ item, showHeart = false }) => {
+const screenWidth = Dimensions.get('window').width;
+const cardWidth = (screenWidth / 2) - 8;
+
+const RecipeCard = ({ item, showHeart = false, onPress }) => {
     return (
-        <Card containerStyle={styles.card}>
-            <View>
-                <Card.Image source={{ uri: item.image }} style={styles.image} />
-                {showHeart && (
-                    <Icon
-                        name="heart"
-                        type="feather"
-                        color="red"
-                        containerStyle={styles.heartIcon}
-                    />
-                )}
-            </View>
-            <Card.Title>{item.title}</Card.Title>
-            <Text style={styles.description}>{item.description}</Text>
-        </Card>
+        <TouchableOpacity style={[styles.touchable, { width: cardWidth }]} onPress={onPress} activeOpacity={0.8}>
+            <Card containerStyle={styles.card}>
+                <View>
+                    <Card.Image source={{ uri: item.image }} style={styles.image} />
+                    {showHeart && (
+                        <Icon
+                            name="heart"
+                            type="feather"
+                            color="red"
+                            containerStyle={styles.heartIcon}
+                        />
+                    )}
+                </View>
+                <Card.Title>{item.title}</Card.Title>
+                <Text style={styles.description}>{item.description}</Text>
+            </Card>
+        </TouchableOpacity>
     );
 };
 
 const styles = StyleSheet.create({
+    touchable: {
+        margin: 0,
+        padding: 2,
+    },
     card: {
-        flex: 1,
-        margin: 5,
         padding: 0,
+        margin: 2,
+        marginHorizontal: 2,
         borderRadius: 5,
+        position: 'relative',
+        elevation: 2,
     },
     image: {
-        height: 100,
+        height: 150,
         width: '100%',
         borderRadius: 5,
     },
+    description: {
+        padding: 8,
+        fontSize: 14,
+        color: '#333',
+    },
     heartIcon: {
         position: 'absolute',
-        top: 8,
-        right: 8,
+        top: 10,
+        right: 10,
+        zIndex: 1,
         backgroundColor: 'white',
         borderRadius: 20,
         padding: 4,
-    },
-    description: {
-        padding: 10,
-        fontSize: 12,
-        color: '#333',
     },
 });
 
