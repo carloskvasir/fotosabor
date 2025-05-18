@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Card, SearchBar, Text } from 'react-native-elements';
-import BottomNavigation from '../../components/BottomNavigation';
+import BottomNavigation from '../components/BottomNavigation.js';
 
 //TODO REMOVER E USAR UM BANCO DE DADOS
 const data = new Array(20).fill({

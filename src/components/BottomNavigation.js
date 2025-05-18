@@ -12,25 +12,25 @@ const BottomNavigation = () => {
                 name="menu"
                 type="feather"
                 color="#fff"
-                onPress={() => navigation.navigate('Home')}
+                onPress={() => navigation.replace('Home')}
             />
             <Icon
                 name="camera"
                 type="feather"
                 color="#fff"
-                onPress={() => navigation.navigate('Camera')}
+                onPress={() => navigation.replace('Camera')}
             />
             <Icon
                 name="heart"
                 type="feather"
                 color="#fff"
-                onPress={() => navigation.navigate('Favorites')}
+                onPress={() => navigation.replace('Favorites')}
             />
             <Icon
                 name="user"
                 type="feather"
                 color="#fff"
-                onPress={() => navigation.navigate('Profile')}
+                onPress={() => navigation.replace('Profile')}
             />
         </View>
     );
