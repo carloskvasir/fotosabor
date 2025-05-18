@@ -79,7 +79,7 @@ const CameraScreen = ({ navigation }) => {
                         text: 'OK',
                         onPress: () => {
                             // Opcionalmente, você pode navegar de volta ou para outra tela
-                            // navigation.goBack() ou navigation.navigate('OutraTela', { imageUri: image })
+                            navigation.navigate('ListItensScreen')
                         }
                     }
                 ]
