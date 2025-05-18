@@ -1,23 +1,29 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, Dimensions, View } from 'react-native';
-import { Card, Text, Icon } from 'react-native-elements';
+import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Card, Icon, Text } from 'react-native-elements';
 
 const screenWidth = Dimensions.get('window').width;
 const cardWidth = (screenWidth / 2) - 8;
 
 const RecipeCard = ({ item, showHeart = false, onPress }) => {
+    const handleHeartPress = () => {
+        Alert.alert('Favorito', 'Receita removida dos favoritos!');
+    };
+
     return (
         <TouchableOpacity style={[styles.touchable, { width: cardWidth }]} onPress={onPress} activeOpacity={0.8}>
             <Card containerStyle={styles.card}>
                 <View>
                     <Card.Image source={{ uri: item.image }} style={styles.image} />
                     {showHeart && (
-                        <Icon
-                            name="heart"
-                            type="feather"
-                            color="red"
-                            containerStyle={styles.heartIcon}
-                        />
+                        <TouchableOpacity onPress={handleHeartPress}>
+                            <Icon
+                                name="heart"
+                                type="feather"
+                                color="red"
+                                containerStyle={styles.heartIcon}
+                            />
+                        </TouchableOpacity>
                     )}
                 </View>
                 <Card.Title>{item.title}</Card.Title>

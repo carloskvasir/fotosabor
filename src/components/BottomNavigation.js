@@ -4,6 +4,7 @@ import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 
 const BottomNavigation = () => {
+
     const navigation = useNavigation();
 
     return (

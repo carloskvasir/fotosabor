@@ -1,12 +1,15 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BottomNavigation from '../components/BottomNavigation';
 
 export default function ProfileScreen() {
+    const navigation = useNavigation();
 
     //todo dados validar banco
     const handleLogout = () => {
         Alert.alert('Logout', 'Você saiu da sua conta.');
+        navigation.navigate('Login');
     };
 
     return (
