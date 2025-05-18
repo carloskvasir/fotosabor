@@ -1,82 +1,23 @@
 import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
-import { Card, SearchBar, Text } from 'react-native-elements';
-import BottomNavigation from './components/BottomNavigation';
-import { StatusBar } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
+import HomeScreen from './src/screens/HomeScreen';
+import CameraScreen from './src/screens/CameraScreen';
+import FavoritesScreen from './src/screens/FavoritesScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
-//TODO REMOVER ESSA VIEW POR BANCO
-const data = new Array(6).fill({
-  title: 'Torta de Frango Cremosa',
-  description:
-      'Massa leve e dourada, recheada com frango cremoso. Perfeita para qualquer momento do dia!',
-  image: 'https://gourmetjr.com.br/wp-content/uploads/2018/03/JPEG-image-B6230B799E47-1_1170x600_acf_cropped_490x292_acf_cropped.jpeg',
-});
+const Stack = createStackNavigator();
 
 export default function App() {
-  return (
-
-
-      <View style={styles.container}>
-          {/* Header com SearchBar */}
-        <SearchBar
-            placeholder="Buscar..."
-            platform="default"
-            containerStyle={styles.searchContainer}
-            inputContainerStyle={styles.searchInputContainer}
-        />
-
-        {/* Grid de Cards */}
-        <FlatList
-            data={data}
-            keyExtractor={(_, index) => index.toString()}
-            numColumns={2}
-            contentContainerStyle={styles.list}
-            renderItem={({ item }) => (
-                <Card containerStyle={styles.card}>
-                  <Card.Image source={{ uri: item.image }} style={styles.image} />
-                  <Card.Title>{item.title}</Card.Title>
-                  <Text style={styles.description}>{item.description}</Text>
-                </Card>
-            )}
-        />
-
-        <BottomNavigation />
-        <StatusBar hidden />
-      </View>
-  );
+    return (
+        <NavigationContainer>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="Camera" component={CameraScreen} />
+                <Stack.Screen name="Favorites" component={FavoritesScreen} />
+                <Stack.Screen name="Profile" component={ProfileScreen} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#6fa8dc',
-  },
-  searchContainer: {
-    backgroundColor: '#6fa8dc',
-    borderBottomWidth: 0,
-    borderTopWidth: 0,
-    paddingTop: 10,
-  },
-  searchInputContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-  },
-  list: {
-    paddingBottom: 80,
-  },
-  card: {
-    flex: 1,
-    margin: 5,
-    padding: 0,
-  },
-  image: {
-    height: 100,
-    width: '100%',
-  },
-  description: {
-    padding: 10,
-    fontSize: 12,
-    color: '#333',
-  }
-});
