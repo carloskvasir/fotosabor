@@ -1,19 +1,19 @@
 import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
-import { Card, SearchBar, Text } from 'react-native-elements';
-import BottomNavigation from '../components/BottomNavigation.js';
+import { SearchBar } from 'react-native-elements';
+import BottomNavigation from '../components/BottomNavigation';
+import RecipeCard from '../components/RecipeCard';
 
-//TODO REMOVER E USAR UM BANCO DE DADOS
+//TODO TROCAR PARA BANCO
 const data = new Array(20).fill({
     title: 'Torta de Frango Cremosa',
-    description:
-        'Massa leve e dourada, recheada com frango cremoso. Perfeita para qualquer momento do dia!',
-    image:
-        'https://gourmetjr.com.br/wp-content/uploads/2018/03/JPEG-image-B6230B799E47-1_1170x600_acf_cropped_490x292_acf_cropped.jpeg',
+    description: 'Massa leve e dourada, recheada com frango cremoso.',
+    image: 'https://gourmetjr.com.br/wp-content/uploads/2018/03/JPEG-image-B6230B799E47-1_1170x600_acf_cropped_490x292_acf_cropped.jpeg',
 });
 
 export default function HomeScreen() {
     return (
+
         <View style={styles.container}>
             <SearchBar
                 placeholder="Buscar..."
@@ -28,11 +28,7 @@ export default function HomeScreen() {
                 numColumns={2}
                 contentContainerStyle={styles.list}
                 renderItem={({ item }) => (
-                    <Card containerStyle={styles.card}>
-                        <Card.Image source={{ uri: item.image }} style={styles.image} />
-                        <Card.Title>{item.title}</Card.Title>
-                        <Text style={styles.description}>{item.description}</Text>
-                    </Card>
+                    <RecipeCard item={item} />
                 )}
             />
 
@@ -58,20 +54,5 @@ const styles = StyleSheet.create({
     },
     list: {
         paddingBottom: 80,
-    },
-    card: {
-        flex: 1,
-        margin: 5,
-        padding: 0,
-        borderRadius: 5,
-    },
-    image: {
-        height: 100,
-        width: '100%',
-    },
-    description: {
-        padding: 10,
-        fontSize: 12,
-        color: '#333',
     },
 });
