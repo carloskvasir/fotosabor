@@ -2,6 +2,7 @@ import React from 'react';
 import { View, FlatList, StyleSheet } from 'react-native';
 import { Card, SearchBar, Text } from 'react-native-elements';
 import BottomNavigation from './components/BottomNavigation';
+import { StatusBar } from 'react-native';
 
 
 //TODO REMOVER ESSA VIEW POR BANCO
@@ -14,8 +15,10 @@ const data = new Array(6).fill({
 
 export default function App() {
   return (
+
+
       <View style={styles.container}>
-        {/* Header com SearchBar */}
+          {/* Header com SearchBar */}
         <SearchBar
             placeholder="Buscar..."
             platform="default"
@@ -39,6 +42,7 @@ export default function App() {
         />
 
         <BottomNavigation />
+        <StatusBar hidden />
       </View>
   );
 }
