@@ -28,7 +28,10 @@ export default function HomeScreen() {
                 numColumns={2}
                 contentContainerStyle={styles.list}
                 renderItem={({ item }) => (
-                    <RecipeCard item={item} showHeart={true} />
+                    <RecipeCard
+                        item={item} showHeart={true}
+                        onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}
+                    />
                 )}
             />
 
