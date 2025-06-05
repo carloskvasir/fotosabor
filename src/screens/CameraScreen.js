@@ -71,6 +71,7 @@ const CameraScreen = ({ navigation }) => {
         }
     };
 
+    //todo remover, apenas para teste e apresentações com o emulador
     const loadTestImage = async () => {
         const testImageUrl = 'https://img.freepik.com/fotos-gratis/vista-superior-tomate-na-tabua-com-limao-pepino-queijo-verduras-na-superficie-cinza_176474-6504.jpg?semt=ais_hybrid&w=740';
 
