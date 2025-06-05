@@ -12,9 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
-
-const GEMINI_API_KEY = ''; // TODO POR A KEY
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+import appConfig from "../../config/appConfig";
 
 export default function ListItensScreen({ route, navigation }) {
 
@@ -76,7 +74,7 @@ export default function ListItensScreen({ route, navigation }) {
                 ],
             };
 
-            const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`${appConfig.GEMINI_API_URL}?key=${appConfig.GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -14,11 +14,9 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { Icon } from 'react-native-elements';
+import appConfig from "../../config/appConfig";
 
 import BottomNavigation from "../components/BottomNavigation";
-
-const GEMINI_API_KEY = ''; // todo informar key
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 const CameraScreen = ({ navigation }) => {
     const [image, setImage] = useState(null);
@@ -117,7 +115,7 @@ const CameraScreen = ({ navigation }) => {
                 ],
             };
 
-            const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(`${appConfig.GEMINI_API_URL}?key=${appConfig.GEMINI_API_KEY}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
