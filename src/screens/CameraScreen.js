@@ -8,16 +8,22 @@ import {
     Image,
     SafeAreaView,
     StatusBar,
-    Platform
+    Platform,
+    ActivityIndicator,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import { Icon } from 'react-native-elements';
+
 import BottomNavigation from "../components/BottomNavigation";
+
+const GEMINI_API_KEY = ''; // todo informar key
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 const CameraScreen = ({ navigation }) => {
     const [image, setImage] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-    // Solicita permissões ao carregar o componente
     useEffect(() => {
         (async () => {
             if (Platform.OS !== 'web') {
@@ -29,7 +35,6 @@ const CameraScreen = ({ navigation }) => {
         })();
     }, []);
 
-    // Função para abrir a câmera
     const openCamera = async () => {
         try {
             const result = await ImagePicker.launchCameraAsync({
@@ -48,7 +53,6 @@ const CameraScreen = ({ navigation }) => {
         }
     };
 
-    // Função para abrir a galeria
     const pickImage = async () => {
         try {
             const result = await ImagePicker.launchImageLibraryAsync({
@@ -67,25 +71,143 @@ const CameraScreen = ({ navigation }) => {
         }
     };
 
-    // Função para salvar a imagem (simula o envio para um servidor)
-    const saveImage = () => {
-        if (image) {
-            // Aqui você implementaria o código para enviar a imagem para seu servidor
-            Alert.alert(
-                'Imagem Salva',
-                'Sua imagem foi salva com sucesso!',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            // Opcionalmente, você pode navegar de volta ou para outra tela
-                            navigation.navigate('ListItensScreen')
-                        }
-                    }
-                ]
+    const loadTestImage = async () => {
+        const testImageUrl = 'https://img.freepik.com/fotos-gratis/vista-superior-tomate-na-tabua-com-limao-pepino-queijo-verduras-na-superficie-cinza_176474-6504.jpg?semt=ais_hybrid&w=740';
+
+        setLoading(true);
+        try {
+            const { uri } = await FileSystem.downloadAsync(
+                testImageUrl,
+                FileSystem.cacheDirectory + 'gemini_test_image.jpg'
             );
+
+            setImage(uri);
+            Alert.alert("Sucesso", "Imagem de teste carregada para simulação.");
+        } catch (error) {
+            console.error("Erro ao carregar imagem de teste:", error);
+            Alert.alert("Erro", "Não foi possível carregar a imagem de teste.\nVerifique a URL e sua conexão.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const sendImageToGemini = async (imageUri) => {
+        setLoading(true);
+        try {
+            const base64Image = await FileSystem.readAsStringAsync(imageUri, {
+                encoding: FileSystem.EncodingType.Base64,
+            });
+
+            const requestBody = {
+                contents: [
+                    {
+                        parts: [
+                            {
+                                text: "Analise esta imagem e me forneça uma lista dos ingredientes principais que você consegue identificar. Retorne a resposta em formato JSON, onde a chave principal é 'ingredientes' e o valor é um array de strings, cada string sendo o nome de um ingrediente. Por exemplo: {'ingredientes': ['tomate', 'cebola', 'queijo']}. Priorize ingredientes culinários visíveis e comuns em receitas. Se não conseguir identificar ingredientes culinários, retorne uma lista vazia."
+                            },
+                            {
+                                inlineData: {
+                                    mimeType: 'image/jpeg',
+                                    data: base64Image,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            };
+
+            const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Erro na API do Gemini:', errorData);
+                Alert.alert(
+                    'Erro na API',
+                    `Não foi possível processar a imagem: ${errorData.error?.message || 'Erro desconhecido'}\n\nDetalhes: ${JSON.stringify(errorData, null, 2)}`
+                );
+                return null;
+            }
+
+            const responseData = await response.json();
+            console.log('Resposta bruta do Gemini:', JSON.stringify(responseData, null, 2));
+
+            let ingredientsList = [];
+            let displayMessage = 'Nenhum ingrediente identificado.';
+
+            try {
+                const geminiTextResponse = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (geminiTextResponse) {
+                    const jsonMatch = geminiTextResponse.match(/```json\s*(\{.*\})\s*```/s);
+                    let jsonString = geminiTextResponse;
+
+                    if (jsonMatch && jsonMatch[1]) {
+                        jsonString = jsonMatch[1];
+                    }
+
+                    const parsedResponse = JSON.parse(jsonString);
+
+                    if (parsedResponse && parsedResponse.ingredientes && Array.isArray(parsedResponse.ingredientes)) {
+                        ingredientsList = parsedResponse.ingredientes;
+                    } else {
+                        displayMessage = `Resposta do Gemini:\n${geminiTextResponse}`;
+                        console.warn("Resposta do Gemini não é um JSON com 'ingredientes':", parsedResponse);
+                    }
+                } else {
+                    displayMessage = "O Gemini não retornou nenhum texto descritivo.";
+                }
+
+            } catch (parseError) {
+                console.error("Erro ao parsear JSON do Gemini:", parseError);
+                displayMessage = `Erro ao interpretar a resposta do Gemini.\n\nResposta bruta: ${responseData.candidates?.[0]?.content?.parts?.[0]?.text || 'Vazio'}`;
+            }
+
+            navigation.navigate('ListItensScreen', { identifiedIngredients: ingredientsList });
+
+            if (ingredientsList.length > 0) {
+                Alert.alert(
+                    'Ingredientes Identificados',
+                    `Os ingredientes são:\n${ingredientsList.join(', ')}`,
+                    [
+                        {
+                            text: 'OK',
+                        }
+                    ]
+                );
+            } else {
+                Alert.alert(
+                    'Resultado da Análise',
+                    displayMessage,
+                    [
+                        {
+                            text: 'OK',
+                        }
+                    ]
+                );
+            }
+
+            return responseData;
+
+        } catch (error) {
+            console.error('Erro geral ao enviar para o Gemini:', error);
+            Alert.alert('Erro de Conexão', 'Não foi possível conectar-se à API do Gemini.\nVerifique sua conexão e a chave de API.');
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const saveImage = async () => {
+        if (image) {
+            await sendImageToGemini(image);
         } else {
-            Alert.alert('Erro', 'Por favor, tire uma foto primeiro');
+            Alert.alert('Erro', 'Por favor, tire ou selecione uma foto primeiro.');
         }
     };
 
@@ -93,7 +215,6 @@ const CameraScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
 
-            {/* Cabeçalho */}
             <View style={styles.header}>
                 <TouchableOpacity
                     style={styles.backButton}
@@ -102,10 +223,9 @@ const CameraScreen = ({ navigation }) => {
                     <Icon name="arrow-left" type="feather" size={24} color="#333" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Câmera</Text>
-                <View style={{ width: 40 }} /> {/* Espaço para balancear o layout */}
+                <View style={{ width: 40 }} />
             </View>
 
-            {/* Área de visualização da imagem */}
             <View style={styles.imageContainer}>
                 {image ? (
                     <Image source={{ uri: image }} style={styles.preview} />
@@ -115,9 +235,14 @@ const CameraScreen = ({ navigation }) => {
                         <Text style={styles.placeholderText}>Nenhuma foto capturada</Text>
                     </View>
                 )}
+                {loading && (
+                    <View style={styles.loadingOverlay}>
+                        <ActivityIndicator size="large" color="#2089dc" />
+                        <Text style={styles.loadingText}>Enviando para o Gemini...</Text>
+                    </View>
+                )}
             </View>
 
-            {/* Botões de ação */}
             <View style={styles.actionButtons}>
                 <TouchableOpacity style={styles.actionButton} onPress={pickImage}>
                     <Icon name="image" type="feather" size={28} color="#2089dc" />
@@ -128,28 +253,32 @@ const CameraScreen = ({ navigation }) => {
                     <Icon name="camera" type="feather" size={32} color="white" />
                 </TouchableOpacity>
 
+                <TouchableOpacity style={styles.actionButton} onPress={loadTestImage}>
+                    <Icon name="test-tube" type="font-awesome-5" size={28} color="#2089dc" />
+                    <Text style={styles.buttonText}>Teste</Text>
+                </TouchableOpacity>
+
                 <TouchableOpacity
                     style={[
                         styles.actionButton,
-                        !image && styles.disabledButton
+                        (!image || loading) && styles.disabledButton
                     ]}
                     onPress={saveImage}
-                    disabled={!image}
+                    disabled={!image || loading}
                 >
                     <Icon
-                        name="check-circle"
+                        name="send"
                         type="feather"
                         size={28}
-                        color={image ? "#2089dc" : "#ccc"}
+                        color={(!image || loading) ? "#ccc" : "#2089dc"}
                     />
-                    <Text style={[styles.buttonText, !image && styles.disabledText]}>Salvar</Text>
+                    <Text style={[styles.buttonText, (!image || loading) && styles.disabledText]}>Enviar</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Instruções */}
             <View style={styles.instructions}>
                 <Text style={styles.instructionText}>
-                    Tire uma foto ou escolha uma da galeria para continuar
+                    Tire uma foto, escolha uma da galeria, ou carregue uma imagem de teste para enviar para o Gemini
                 </Text>
             </View>
 
@@ -246,6 +375,18 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#666',
         fontSize: 14,
+    },
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 12,
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#333',
     },
 });
 
