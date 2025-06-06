@@ -52,6 +52,7 @@ const analyzeImage = async (imageUri, prompt) => {
     }
 };
 
+//todo mudar o prompt para o receitas
 const generateRecipes = async (ingredients) => {
 
     const prompt = `Com base nos seguintes ingredientes: ${ingredients.join(', ')}. Por favor, forneça 3 sugestões de receitas simples e práticas que utilizem esses ingredientes. Para cada receita, inclua:
