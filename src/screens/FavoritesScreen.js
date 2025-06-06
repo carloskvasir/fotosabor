@@ -1,11 +1,11 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import { auth } from '../../firebaseConfig';
 import BottomNavigation from '../components/BottomNavigation';
 import RecipeCard from '../components/RecipeCard';
-import { getUserFavorites } from '../services/firestoreService';
+import { getFullRecipe, getUserFavorites } from '../services/firestoreService';
 
 export default function FavoritesScreen() {
     const navigation = useNavigation();
@@ -38,8 +38,49 @@ export default function FavoritesScreen() {
     );
 
     const filteredFavorites = favorites.filter(item =>
-        item.title.toLowerCase().includes(searchText.toLowerCase())
+        item.name && item.name.toLowerCase().includes(searchText.toLowerCase())
     );
+
+    const handleFavoritePress = async (favoriteItem) => {
+        console.log('🔍 Debug - Favorito clicado:', favoriteItem);
+        console.log('🔍 Debug - ID do favorito:', favoriteItem.recipeId || favoriteItem.id);
+        
+        try {
+            // Buscar receita completa da coleção full_recipe
+            const fullRecipe = await getFullRecipe(favoriteItem.recipeId || favoriteItem.id);
+            console.log('🔍 Debug - Receita completa encontrada:', !!fullRecipe);
+            
+            if (fullRecipe) {
+                console.log('🔍 Debug - Dados da receita completa:', fullRecipe);
+                // Navegar com a receita completa
+                navigation.navigate('RecipeDetail', { 
+                    recipe: fullRecipe,
+                    originalImage: null, // Favoritos não têm imagem original
+                    detectedIngredients: [] // Favoritos não têm ingredientes detectados
+                });
+            } else {
+                console.log('⚠️ Receita completa não encontrada, usando dados do favorito');
+                // Fallback: usar dados básicos do favorito
+                Alert.alert(
+                    'Receita não encontrada', 
+                    'A receita completa não foi encontrada no banco. Exibindo dados básicos.',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => navigation.navigate('RecipeDetail', { 
+                                recipe: favoriteItem,
+                                originalImage: null,
+                                detectedIngredients: []
+                            })
+                        }
+                    ]
+                );
+            }
+        } catch (error) {
+            console.error('❌ Erro ao buscar receita completa:', error);
+            Alert.alert('Erro', 'Não foi possível carregar a receita completa.');
+        }
+    };
 
     if (loading) {
         return (
@@ -79,7 +120,7 @@ export default function FavoritesScreen() {
                         <RecipeCard
                             item={item}
                             showHeart={true}
-                            onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}
+                            onPress={() => handleFavoritePress(item)}
                         />
                     )}
                 />

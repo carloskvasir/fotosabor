@@ -7,10 +7,10 @@ import CameraScreen from './src/screens/CameraScreen';
 import FavoritesScreen from './src/screens/FavoritesScreen';
 import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
 import HomeScreen from './src/screens/HomeScreen';
-import ListItensScreen from "./src/screens/ListItensScreen";
 import LoginScreen from './src/screens/LoginScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import RecipeDetailScreen from "./src/screens/RecipeDetailsScreen";
+import RecipeResultsScreen from "./src/screens/RecipeResultsScreen";
 import RegisterScreen from './src/screens/RegisterScreen';
 
 const Stack = createStackNavigator();
@@ -33,7 +33,7 @@ function AppStack() {
             <Stack.Screen name="Favorites" component={FavoritesScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="RecipeDetail" component={RecipeDetailScreen} />
-            <Stack.Screen name="ListItensScreen" component={ListItensScreen} />
+            <Stack.Screen name="RecipeResults" component={RecipeResultsScreen} />
         </Stack.Navigator>
     );
 }

@@ -19,7 +19,8 @@ import {
 import { Icon } from 'react-native-elements';
 
 import BottomNavigation from "../components/BottomNavigation";
-import { analyzeImage } from "../service/geminiService";
+import { PROMPTS } from "../config/geminiPrompts";
+import { analyzeImage, generateBannerRecipe } from "../service/geminiService";
 
 const CameraScreen = ({ navigation }) => {
     const [image, setImage] = useState(null);
@@ -173,40 +174,33 @@ const CameraScreen = ({ navigation }) => {
     const sendImageToGemini = async (imageUri) => {
         setLoading(true);
         try {
-            const prompt = "Analise esta imagem e me forneça uma lista dos ingredientes principais que você consegue identificar. Retorne a resposta em formato JSON, onde a chave principal é 'ingredientes' e o valor é um array de strings, cada string sendo o nome de um ingrediente. Por exemplo: {'ingredientes': ['tomate', 'cebola', 'queijo']}. Priorize ingredientes culinários visíveis e comuns em receitas. Se não conseguir identificar ingredientes culinários, retorne uma lista vazia.";
-            const responseData = await analyzeImage(imageUri, prompt);
+            console.log('\n🔸 INICIANDO ANÁLISE DE INGREDIENTES 🔸');
+            console.log('📷 Image URI:', imageUri);
+            
+            const prompt = PROMPTS.ANALYZE_INGREDIENTS;
+            console.log(`📝 Prompt enviado: ${prompt}`);
+            
+            const responseData = await analyzeImage(imageUri);
 
+            console.log('\n🔹 PROCESSANDO RESPOSTA DE INGREDIENTES 🔹');
             console.log('Resposta bruta do Gemini:', JSON.stringify(responseData, null, 2));
 
             let ingredientsList = [];
             let displayMessage = 'Nenhum ingrediente identificado.';
 
             try {
-                const geminiTextResponse = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (geminiTextResponse) {
-                    const jsonMatch = geminiTextResponse.match(/```json\s*(\{.*\})\s*```/s);
-                    let jsonString = geminiTextResponse;
-
-                    if (jsonMatch && jsonMatch[1]) {
-                        jsonString = jsonMatch[1];
-                    }
-
-                    const parsedResponse = JSON.parse(jsonString);
-
-                    if (parsedResponse && parsedResponse.ingredientes && Array.isArray(parsedResponse.ingredientes)) {
-                        ingredientsList = parsedResponse.ingredientes;
-                    } else {
-                        displayMessage = `Resposta do Gemini:\n${geminiTextResponse}`;
-                        console.warn("Resposta do Gemini não é um JSON com 'ingredientes':", parsedResponse);
-                    }
+                // Parse direto da resposta - sem validação
+                if (responseData && responseData.ingredients) {
+                    ingredientsList = responseData.ingredients;
+                    console.log('✅ Ingredientes obtidos:', ingredientsList);
                 } else {
-                    displayMessage = "O Gemini não retornou nenhum texto descritivo.";
+                    console.warn("❌ Resposta não contém ingredientes:", responseData);
+                    displayMessage = `Formato inválido. Resposta recebida:\n${JSON.stringify(responseData)}`;
                 }
 
             } catch (parseError) {
-                console.error("Erro ao parsear JSON do Gemini:", parseError);
-                displayMessage = `Erro ao interpretar a resposta do Gemini.\n\nResposta bruta: ${responseData.candidates?.[0]?.content?.parts?.[0]?.text || 'Vazio'}`;
+                console.error("Erro ao processar resposta do Gemini:", parseError);
+                displayMessage = `Erro ao interpretar a resposta do Gemini.\n\nResposta bruta: ${JSON.stringify(responseData)}`;
             }
 
             // Show result with animation instead of immediate navigation
@@ -228,16 +222,52 @@ const CameraScreen = ({ navigation }) => {
         }
     };
 
-    const proceedToIngredients = () => {
+    const proceedToIngredients = async () => {
         if (editableIngredients && editableIngredients.length > 0) {
-            hideAnalysisResult();
-            // Small delay to let animation finish
-            setTimeout(() => {
-                navigation.navigate('ListItensScreen', { 
-                    identifiedIngredients: editableIngredients,
-                    originalImage: analysisResult.image
-                });
-            }, 250);
+            setLoading(true);
+            try {
+                console.log('\n🔸 INICIANDO GERAÇÃO DE BANNER 🔸');
+                console.log('🥘 Ingredientes enviados:', editableIngredients);
+                
+                const responseData = await generateBannerRecipe(editableIngredients);
+                
+                console.log('\n🔹 PROCESSANDO RESPOSTA DE BANNER 🔹');
+                console.log('Resposta bruta do Gemini (Banner):', JSON.stringify(responseData, null, 2));
+
+                let bannersData = [];
+                let displayMessage = 'Nenhum banner gerado.';
+
+                try {
+                    // Parse direto da resposta - sem validação
+                    if (responseData && responseData.recipes && Array.isArray(responseData.recipes)) {
+                        bannersData = responseData.recipes;
+                        console.log('✅ Banners obtidos:', bannersData.length);
+                    } else {
+                        console.warn("❌ Resposta não contém dados dos banners:", responseData);
+                        displayMessage = `Formato inválido. Resposta recebida:\n${JSON.stringify(responseData)}`;
+                    }
+
+                } catch (parseError) {
+                    console.error("Erro ao processar resposta do banner:", parseError);
+                    displayMessage = `Erro ao interpretar a resposta do Gemini.\n\nResposta bruta: ${JSON.stringify(responseData)}`;
+                }
+
+                hideAnalysisResult();
+                // Small delay to let animation finish
+                setTimeout(() => {
+                    navigation.navigate('RecipeResults', { 
+                        recipes: bannersData,
+                        ingredients: editableIngredients,
+                        originalImage: analysisResult.image
+                    });
+                }, 250);
+
+            } catch (error) {
+                console.error('Erro geral ao gerar banner:', error);
+                Alert.alert('Erro de Conexão', 'Não foi possível conectar-se à API do Gemini para gerar o banner.\nVerifique sua conexão e a chave de API.');
+            } finally {
+                setLoading(false);
+            }
         } else {
             Alert.alert('Atenção', 'Você removeu todos os ingredientes. Pelo menos um ingrediente é necessário para prosseguir.');
         }
@@ -395,7 +425,7 @@ const CameraScreen = ({ navigation }) => {
                                         onPress={proceedToIngredients}
                                         disabled={editableIngredients.length === 0}
                                     >
-                                        <Text style={styles.primaryBtnText}>Buscar Receitas</Text>
+                                        <Text style={styles.primaryBtnText}>Gerar Receitas</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity 
                                         style={[styles.actionBtn, styles.secondaryBtn]} 

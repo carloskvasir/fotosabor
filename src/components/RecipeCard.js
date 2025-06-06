@@ -1,4 +1,3 @@
-import React from 'react';
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Card, Icon, Text } from 'react-native-elements';
 
@@ -10,11 +9,16 @@ const RecipeCard = ({ item, showHeart = false, onPress }) => {
         Alert.alert('Favorito', 'Receita removida dos favoritos!');
     };
 
+    // Support both data structures (title/name, image/imageUrl)
+    const title = item.title || item.name || 'Receita sem nome';
+    const imageUrl = item.image || item.imageUrl || null;
+    const description = item.description || 'Sem descrição';
+
     return (
         <TouchableOpacity style={[styles.touchable, { width: cardWidth }]} onPress={onPress} activeOpacity={0.8}>
             <Card containerStyle={styles.card}>
                 <View>
-                    <Card.Image source={{ uri: item.image }} style={styles.image} />
+                    {imageUrl && <Card.Image source={{ uri: imageUrl }} style={styles.image} />}
                     {showHeart && (
                         <TouchableOpacity onPress={handleHeartPress}>
                             <Icon
@@ -26,8 +30,8 @@ const RecipeCard = ({ item, showHeart = false, onPress }) => {
                         </TouchableOpacity>
                     )}
                 </View>
-                <Card.Title>{item.title}</Card.Title>
-                <Text style={styles.description}>{item.description}</Text>
+                <Card.Title>{title}</Card.Title>
+                <Text style={styles.description}>{description}</Text>
             </Card>
         </TouchableOpacity>
     );
