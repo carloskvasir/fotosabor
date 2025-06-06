@@ -14,9 +14,9 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { Icon } from 'react-native-elements';
-import appConfig from "../../config/appConfig";
 
 import BottomNavigation from "../components/BottomNavigation";
+import { analyzeImage } from "../service/geminiService";
 
 const CameraScreen = ({ navigation }) => {
     const [image, setImage] = useState(null);
@@ -93,47 +93,9 @@ const CameraScreen = ({ navigation }) => {
     const sendImageToGemini = async (imageUri) => {
         setLoading(true);
         try {
-            const base64Image = await FileSystem.readAsStringAsync(imageUri, {
-                encoding: FileSystem.EncodingType.Base64,
-            });
+            const prompt = "Analise esta imagem e me forneça uma lista dos ingredientes principais que você consegue identificar. Retorne a resposta em formato JSON, onde a chave principal é 'ingredientes' e o valor é um array de strings, cada string sendo o nome de um ingrediente. Por exemplo: {'ingredientes': ['tomate', 'cebola', 'queijo']}. Priorize ingredientes culinários visíveis e comuns em receitas. Se não conseguir identificar ingredientes culinários, retorne uma lista vazia.";
+            const responseData = await analyzeImage(imageUri, prompt);
 
-            const requestBody = {
-                contents: [
-                    {
-                        parts: [
-                            {
-                                text: "Analise esta imagem e me forneça uma lista dos ingredientes principais que você consegue identificar. Retorne a resposta em formato JSON, onde a chave principal é 'ingredientes' e o valor é um array de strings, cada string sendo o nome de um ingrediente. Por exemplo: {'ingredientes': ['tomate', 'cebola', 'queijo']}. Priorize ingredientes culinários visíveis e comuns em receitas. Se não conseguir identificar ingredientes culinários, retorne uma lista vazia."
-                            },
-                            {
-                                inlineData: {
-                                    mimeType: 'image/jpeg',
-                                    data: base64Image,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            };
-
-            const response = await fetch(`${appConfig.GEMINI_API_URL}?key=${appConfig.GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Erro na API do Gemini:', errorData);
-                Alert.alert(
-                    'Erro na API',
-                    `Não foi possível processar a imagem: ${errorData.error?.message || 'Erro desconhecido'}\n\nDetalhes: ${JSON.stringify(errorData, null, 2)}`
-                );
-                return null;
-            }
-
-            const responseData = await response.json();
             console.log('Resposta bruta do Gemini:', JSON.stringify(responseData, null, 2));
 
             let ingredientsList = [];
@@ -253,7 +215,7 @@ const CameraScreen = ({ navigation }) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.actionButton} onPress={loadTestImage}>
-                    <Icon name="test-tube" type="font-awesome-5" size={28} color="#2089dc" />
+                    <Icon name="test-image" type="font-awesome-5" size={28} color="#2089dc" />
                     <Text style={styles.buttonText}>Teste</Text>
                 </TouchableOpacity>
 

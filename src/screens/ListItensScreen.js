@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
-import appConfig from "../../config/appConfig";
+import { generateRecipes } from "../service/geminiService";
 
 export default function ListItensScreen({ route, navigation }) {
 
@@ -23,26 +23,18 @@ export default function ListItensScreen({ route, navigation }) {
     useEffect(() => {
 
         if (identifiedIngredients.length > 0) {
-
             const newItems = identifiedIngredients.map((ingredient, index) => ({
                 id: `gemini-${Date.now()}-${index}`,
                 nome: ingredient.toUpperCase(),
             }));
 
-            setItens((prevItens) => {
-                const updatedItens = [...prevItens];
-                newItems.forEach(newItem => {
-                    if (!updatedItens.some(existingItem => existingItem.nome === newItem.nome)) {
-                        updatedItens.push(newItem);
-                    }
-                });
-                return updatedItens;
-            });
-
+            setItens(newItems);
             Alert.alert("Sucesso", "Ingredientes da imagem adicionados à lista!");
         } else {
-            Alert.alert("Informação", "Nenhum ingrediente novo foi identificado pela imagem.");
+
+            setItens([]);
         }
+
     }, [identifiedIngredients]);
 
     const deletarItem = (id) => {
@@ -56,43 +48,10 @@ export default function ListItensScreen({ route, navigation }) {
         }
 
         setLoadingRecipes(true);
-        const ingredientNames = itens.map(item => item.nome);
-        const prompt = `Com base nos seguintes ingredientes: ${ingredientNames.join(', ')}. Por favor, forneça 3 sugestões de receitas simples e práticas que utilizem esses ingredientes. Para cada receita, inclua:
-        1. Nome da Receita
-        2. Ingredientes necessários (da lista fornecida e outros comuns, se aplicável)
-        3. Instruções de preparo concisas.
-        Retorne a resposta em formato JSON. O JSON deve ter uma chave principal 'receitas' que contém um array de objetos. Cada objeto de receita deve ter as chaves 'nome', 'ingredientes' (array de strings) e 'instrucoes' (string).`;
-
         try {
-            const requestBody = {
-                contents: [
-                    {
-                        parts: [
-                            { text: prompt }
-                        ],
-                    },
-                ],
-            };
+            const ingredientNames = itens.map(item => item.nome);
+            const responseData = await generateRecipes(ingredientNames);
 
-            const response = await fetch(`${appConfig.GEMINI_API_URL}?key=${appConfig.GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Erro na API do Gemini (Receitas):', errorData);
-                Alert.alert(
-                    'Erro na API',
-                    `Não foi possível gerar receitas: ${errorData.error?.message || 'Erro desconhecido'}`
-                );
-                return;
-            }
-
-            const responseData = await response.json();
             console.log('Resposta bruta do Gemini (Receitas):', JSON.stringify(responseData, null, 2));
 
             let recipes = [];
@@ -127,7 +86,7 @@ export default function ListItensScreen({ route, navigation }) {
             }
 
             if (recipes.length > 0) {
-
+                // TODO MUDAR PARA A HOMESCREEN
                 let recipesText = recipes.map((recipe, index) =>
                     `Receita ${index + 1}: ${recipe.nome}\nIngredientes: ${recipe.ingredientes.join(', ')}\nInstruções: ${recipe.instrucoes}`
                 ).join('\n\n---\n\n');
