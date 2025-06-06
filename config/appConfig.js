@@ -1,6 +1,8 @@
+import Constants from 'expo-constants';
+
 const appConfig = {
-    GEMINI_API_URL: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
-    GEMINI_API_KEY: "" //todo informar key
+    GEMINI_API_URL: Constants.expoConfig?.extra?.geminiApiUrl,
+    GEMINI_API_KEY: Constants.expoConfig?.extra?.geminiApiKey
 };
 
 export default appConfig;

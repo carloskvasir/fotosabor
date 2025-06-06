@@ -1,34 +1,83 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { useEffect, useState } from 'react';
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { auth } from '../../firebaseConfig';
 import BottomNavigation from '../components/BottomNavigation';
 
 export default function ProfileScreen() {
     const navigation = useNavigation();
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    //todo dados validar banco
-    const handleLogout = () => {
-        Alert.alert('Logout', 'Você saiu da sua conta.');
-        navigation.navigate('Login');
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUser(user);
+            } else {
+                // Usuário não autenticado, redirecionar para login
+                navigation.replace('Login');
+            }
+            setLoading(false);
+        });
+
+        return () => unsubscribe(); // Cleanup subscription on unmount
+    }, [navigation]);
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            Alert.alert('Logout', 'Você saiu da sua conta.');
+            navigation.replace('Login');
+        } catch (error) {
+            Alert.alert('Erro', 'Não foi possível fazer logout');
+        }
     };
 
-    return (
+    if (loading) {
+        return (
+            <View style={styles.container}>
+                <Text>Carregando...</Text>
+            </View>
+        );
+    }
 
-        //todo dados validar banco
+    if (!user) {
+        return null; // Será redirecionado para login
+    }
+
+    return (
         <View style={styles.container}>
             <View style={styles.profileContainer}>
                 <Image
-                    source={{ uri: 'https://cdn-icons-png.flaticon.com/512/5556/5556520.png' }}
+                    source={{ 
+                        uri: user.photoURL || 'https://cdn-icons-png.flaticon.com/512/5556/5556520.png' 
+                    }}
                     style={styles.profileImage}
                 />
-                <Text style={styles.name}>João da Silva</Text>
+                <Text style={styles.name}>
+                    {user.displayName || 'Usuário'}
+                </Text>
 
                 <View style={styles.infoContainer}>
-                    <Text style={styles.label}>Telefone</Text>
-                    <Text style={styles.info}>📞 (11) 98765-4321</Text>
-
                     <Text style={styles.label}>Email</Text>
-                    <Text style={styles.info}>📧 joao.silva@email.com</Text>
+                    <Text style={styles.info}>📧 {user.email}</Text>
+
+                    <Text style={styles.label}>Conta criada em</Text>
+                    <Text style={styles.info}>
+                        📅 {user.metadata.creationTime ? 
+                            new Date(user.metadata.creationTime).toLocaleDateString('pt-BR') : 
+                            'Data não disponível'
+                        }
+                    </Text>
+
+                    <Text style={styles.label}>Último acesso</Text>
+                    <Text style={styles.info}>
+                        🕒 {user.metadata.lastSignInTime ? 
+                            new Date(user.metadata.lastSignInTime).toLocaleDateString('pt-BR') : 
+                            'Data não disponível'
+                        }
+                    </Text>
                 </View>
 
                 <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

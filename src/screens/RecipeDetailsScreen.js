@@ -1,16 +1,62 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, Icon } from 'react-native-elements';
+import { useEffect, useState } from 'react';
+import { Alert, Image, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Icon, Text } from 'react-native-elements';
+import { auth } from '../../firebaseConfig';
 import BottomNavigation from '../components/BottomNavigation';
+import { addToFavorites, isFavorite, removeFromFavorites } from '../services/firestoreService';
 
 export default function RecipeDetailScreen({ route }) {
-
     const { recipe } = route.params;
-    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFav, setIsFav] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const user = auth.currentUser;
 
-    //todo salvar o favorito no banco
-    const toggleFavorite = () => {
-        setIsFavorite(!isFavorite);
+    useEffect(() => {
+        checkIfFavorite();
+    }, []);
+
+    const checkIfFavorite = async () => {
+        if (user && recipe.id) {
+            const favoriteStatus = await isFavorite(user.uid, recipe.id);
+            setIsFav(favoriteStatus);
+        }
+    };
+
+    const toggleFavorite = async () => {
+        if (!user) {
+            Alert.alert('Erro', 'Você precisa estar logado para favoritar receitas');
+            return;
+        }
+
+        if (!recipe.id) {
+            // Se a receita não tem ID, criar um baseado no título
+            recipe.id = recipe.title.toLowerCase().replace(/\s+/g, '-');
+        }
+
+        setLoading(true);
+        try {
+            if (isFav) {
+                const success = await removeFromFavorites(user.uid, recipe.id);
+                if (success) {
+                    setIsFav(false);
+                    Alert.alert('Sucesso', 'Receita removida dos favoritos!');
+                } else {
+                    Alert.alert('Erro', 'Não foi possível remover dos favoritos');
+                }
+            } else {
+                const success = await addToFavorites(user.uid, recipe);
+                if (success) {
+                    setIsFav(true);
+                    Alert.alert('Sucesso', 'Receita adicionada aos favoritos!');
+                } else {
+                    Alert.alert('Erro', 'Não foi possível adicionar aos favoritos');
+                }
+            }
+        } catch (error) {
+            Alert.alert('Erro', 'Ocorreu um erro inesperado');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -20,11 +66,11 @@ export default function RecipeDetailScreen({ route }) {
 
                 <View style={styles.header}>
                     <Text style={styles.title}>{recipe.title}</Text>
-                    <TouchableOpacity onPress={toggleFavorite}>
+                    <TouchableOpacity onPress={toggleFavorite} disabled={loading}>
                         <Icon
                             name="heart"
                             type="feather"
-                            color={isFavorite ? 'red' : 'gray'}
+                            color={isFav ? 'red' : 'gray'}
                             size={28}
                         />
                     </TouchableOpacity>

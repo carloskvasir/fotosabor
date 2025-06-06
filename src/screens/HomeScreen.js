@@ -1,16 +1,16 @@
-import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { useNavigation } from "@react-navigation/native";
+import { FlatList, StyleSheet, View } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import BottomNavigation from '../components/BottomNavigation';
 import RecipeCard from '../components/RecipeCard';
-import {useNavigation} from "@react-navigation/native";
 
 //TODO TROCAR PARA BANCO
-const data = new Array(20).fill({
+const data = new Array(20).fill(0).map((_, index) => ({
+    id: `recipe-${index}`,
     title: 'Torta de Frango Cremosa',
     description: 'Massa leve e dourada, recheada com frango cremoso.',
     image: 'https://gourmetjr.com.br/wp-content/uploads/2018/03/JPEG-image-B6230B799E47-1_1170x600_acf_cropped_490x292_acf_cropped.jpeg',
-});
+}));
 
 export default function HomeScreen() {
 
