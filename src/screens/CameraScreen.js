@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
+import { useEffect, useState } from 'react';
 import {
-    View,
-    TouchableOpacity,
-    StyleSheet,
+    ActivityIndicator,
     Alert,
-    Text,
     Image,
+    Platform,
     SafeAreaView,
     StatusBar,
-    Platform,
-    ActivityIndicator,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
 import { Icon } from 'react-native-elements';
 
 import BottomNavigation from "../components/BottomNavigation";
@@ -215,7 +215,7 @@ const CameraScreen = ({ navigation }) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.actionButton} onPress={loadTestImage}>
-                    <Icon name="test-image" type="font-awesome-5" size={28} color="#2089dc" />
+                    <Icon name="image" type="feather" size={28} color="#2089dc" />
                     <Text style={styles.buttonText}>Teste</Text>
                 </TouchableOpacity>
 
