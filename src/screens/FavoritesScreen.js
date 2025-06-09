@@ -4,7 +4,7 @@ import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, View } from 'reac
 import { SearchBar } from 'react-native-elements';
 import { auth } from '../../firebaseConfig';
 import BottomNavigation from '../components/BottomNavigation';
-import RecipeCard from '../components/RecipeCard';
+import ModernRecipeCard from '../components/ModernRecipeCard';
 import { getFullRecipe, getUserFavorites } from '../services/firestoreService';
 
 export default function FavoritesScreen() {
@@ -114,12 +114,15 @@ export default function FavoritesScreen() {
                 <FlatList
                     data={filteredFavorites}
                     keyExtractor={(item) => item.id.toString()}
-                    numColumns={2}
                     contentContainerStyle={styles.list}
+                    showsVerticalScrollIndicator={false}
+                    ItemSeparatorComponent={() => <View style={styles.separator} />}
                     renderItem={({ item }) => (
-                        <RecipeCard
+                        <ModernRecipeCard
                             item={item}
-                            showHeart={true}
+                            showFavoriteIcon={true}
+                            showIngredients={false}
+                            cardStyle="compact"
                             onPress={() => handleFavoritePress(item)}
                         />
                     )}
@@ -148,6 +151,11 @@ const styles = StyleSheet.create({
     },
     list: {
         paddingBottom: 80,
+        paddingHorizontal: 16,
+        paddingTop: 8,
+    },
+    separator: {
+        height: 4,
     },
     centerContent: {
         flex: 1,

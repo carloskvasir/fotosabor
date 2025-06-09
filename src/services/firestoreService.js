@@ -121,3 +121,59 @@ export const getFullRecipe = async (recipeId) => {
         return null;
     }
 };
+
+// Buscar receitas de banner para exibir na home
+export const getBannerRecipes = async (limit = 20) => {
+    try {
+        const bannerQuery = collection(db, 'banner_recipe');
+        const querySnapshot = await getDocs(bannerQuery);
+        const banners = [];
+        
+        querySnapshot.forEach((doc) => {
+            banners.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        // Limitar o número de resultados
+        return banners.slice(0, limit);
+    } catch (error) {
+        console.error('Erro ao buscar receitas de banner:', error);
+        return [];
+    }
+};
+
+// Buscar todas as receitas públicas
+export const getPublicRecipes = async (limit = 20) => {
+    try {
+        const recipesQuery = collection(db, 'full_recipe');
+        const querySnapshot = await getDocs(recipesQuery);
+        const recipes = [];
+        
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            recipes.push({
+                id: doc.id,
+                title: data.name || data.title,
+                name: data.name || data.title,
+                description: data.description,
+                imageUrl: data.imageUrl || data.image,
+                image: data.imageUrl || data.image,
+                ...data
+            });
+        });
+        
+        // Limitar o número de resultados e ordenar por data de criação (se disponível)
+        return recipes
+            .sort((a, b) => {
+                const dateA = new Date(a.createdAt || 0);
+                const dateB = new Date(b.createdAt || 0);
+                return dateB - dateA; // Mais recentes primeiro
+            })
+            .slice(0, limit);
+    } catch (error) {
+        console.error('Erro ao buscar receitas públicas:', error);
+        return [];
+    }
+};
