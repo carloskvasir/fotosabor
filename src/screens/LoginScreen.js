@@ -1,16 +1,16 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { useState } from "react";
-import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { auth } from "../../firebaseConfig";
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useState } from 'react';
+import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { auth } from '../config/firebaseConfig';
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
+      Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
 
@@ -18,21 +18,21 @@ export default function LoginScreen({ navigation }) {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // O estado de autenticação mudará automaticamente e redirecionará para AppStack
-      console.log("Login realizado com sucesso");
+      console.log('Login realizado com sucesso');
     } catch (error) {
-      let errorMessage = "Erro ao fazer login";
-      
+      let errorMessage = 'Erro ao fazer login';
+
       if (error.code === 'auth/user-not-found') {
-        errorMessage = "Usuário não encontrado";
+        errorMessage = 'Usuário não encontrado';
       } else if (error.code === 'auth/wrong-password') {
-        errorMessage = "Senha incorreta";
+        errorMessage = 'Senha incorreta';
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = "Email inválido";
+        errorMessage = 'Email inválido';
       } else if (error.code === 'auth/user-disabled') {
-        errorMessage = "Conta desabilitada";
+        errorMessage = 'Conta desabilitada';
       }
-      
-      Alert.alert("Erro", errorMessage);
+
+      Alert.alert('Erro', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -56,20 +56,20 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
         style={styles.input}
       />
-      <Button title={loading ? "Entrando..." : "Entrar"} onPress={handleLogin} disabled={loading} />
-      
-      <TouchableOpacity 
-        style={styles.forgotLink} 
-        onPress={() => navigation.navigate("ForgotPassword")}
+      <Button title={loading ? 'Entrando...' : 'Entrar'} onPress={handleLogin} disabled={loading} />
+
+      <TouchableOpacity
+        style={styles.forgotLink}
+        onPress={() => navigation.navigate('ForgotPassword')}
       >
         <Text style={styles.linkText}>
           Esqueci minha senha
         </Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={styles.registerLink} 
-        onPress={() => navigation.navigate("Register")}
+
+      <TouchableOpacity
+        style={styles.registerLink}
+        onPress={() => navigation.navigate('Register')}
       >
         <Text style={styles.linkText}>
           Não tem uma conta? Criar conta
@@ -82,33 +82,33 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     padding: 24,
-    backgroundColor: "#fff"
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 28,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 24,
-    textAlign: "center"
+    textAlign: 'center',
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 6,
     padding: 12,
-    marginBottom: 16
+    marginBottom: 16,
   },
   registerLink: {
     marginTop: 16,
-    alignItems: "center"
+    alignItems: 'center',
   },
   forgotLink: {
     marginTop: 12,
-    alignItems: "center"
+    alignItems: 'center',
   },
   linkText: {
-    color: "#3b5998",
-    fontSize: 16
-  }
+    color: '#3b5998',
+    fontSize: 16,
+  },
 });

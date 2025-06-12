@@ -1,10 +1,10 @@
 export const PROMPTS = {
-    ANALYZE_INGREDIENTS: `Analyze this image and identify all visible ingredients.
+  ANALYZE_INGREDIENTS: `Analyze this image and identify all visible ingredients.
 Return ONLY valid JSON with ingredient names in PORTUGUESE.
 Format: {"ingredients":["ingrediente1","ingrediente2"]}
 No additional text, just JSON.`,
 
-    GENERATE_BANNER_RECIPE: (ingredients) => `
+  GENERATE_BANNER_RECIPE: (ingredients) => `
 Create 3 different recipe banners using these ingredients: ${ingredients.join(', ')}
 
 IMPORTANT: Write the recipe names, descriptions and instructions in PORTUGUESE (Brazilian Portuguese).
@@ -44,7 +44,7 @@ Return EXACTLY this JSON structure with REAL VALUES (not the word "string"):
 
 Make each recipe different in cooking style and complexity. Replace ALL placeholder values with real content. No additional text, just JSON.`,
 
-    GENERATE_FULL_RECIPE: (recipeName, ingredients) => `
+  GENERATE_FULL_RECIPE: (recipeName, ingredients) => `
 Create a complete recipe for: ${recipeName}
 Using these ingredients: ${ingredients.join(', ')}
 
@@ -72,5 +72,5 @@ Return EXACTLY this JSON structure with REAL VALUES (not the word "string"):
   }
 }
 
-Replace ALL placeholder values with real content. No additional text, just JSON.`
+Replace ALL placeholder values with real content. No additional text, just JSON.`,
 };

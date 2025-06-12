@@ -2,30 +2,30 @@ require('dotenv').config();
 
 export default {
   expo: {
-    name: "FotoSabor",
-    slug: "fotosabor",
-    version: "1.0.0",
-    orientation: "portrait",
-    icon: "./assets/icon.png",
-    userInterfaceStyle: "light",
+    name: 'FotoSabor',
+    slug: 'fotosabor',
+    version: '1.0.0',
+    orientation: 'portrait',
+    icon: './assets/icon.png',
+    userInterfaceStyle: 'light',
     newArchEnabled: true,
     splash: {
-      image: "./assets/splash-icon.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff"
+      image: './assets/splash-icon.png',
+      resizeMode: 'contain',
+      backgroundColor: '#ffffff',
     },
     ios: {
-      supportsTablet: true
+      supportsTablet: true,
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#ffffff"
+        foregroundImage: './assets/adaptive-icon.png',
+        backgroundColor: '#ffffff',
       },
-      edgeToEdgeEnabled: true
+      edgeToEdgeEnabled: true,
     },
     web: {
-      favicon: "./assets/favicon.png"
+      favicon: './assets/favicon.png',
     },
     extra: {
       firebaseApiKey: process.env.FIREBASE_API_KEY,
@@ -37,6 +37,6 @@ export default {
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
       geminiApiUrl: process.env.GEMINI_API_URL,
       geminiApiKey: process.env.GEMINI_API_KEY,
-    }
-  }
+    },
+  },
 };

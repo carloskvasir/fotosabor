@@ -5,8 +5,8 @@ export const IngredienteType = PropTypes.oneOfType([
   PropTypes.string,
   PropTypes.shape({
     nome: PropTypes.string.isRequired,
-    quantidade: PropTypes.string.isRequired
-  })
+    quantidade: PropTypes.string.isRequired,
+  }),
 ]);
 
 // Definição de tipos para receita completa
@@ -16,12 +16,12 @@ export const ReceitaType = PropTypes.shape({
   ingredientes: PropTypes.arrayOf(IngredienteType).isRequired,
   modoPreparo: PropTypes.oneOfType([
     PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string)
+    PropTypes.arrayOf(PropTypes.string),
   ]).isRequired,
   tempoPreparo: PropTypes.string,
   porcoes: PropTypes.string,
   dificuldade: PropTypes.oneOf(['Fácil', 'Médio', 'Difícil']),
-  image: PropTypes.string
+  image: PropTypes.string,
 });
 
 // Definição de tipos para receita da lista
@@ -31,7 +31,7 @@ export const ReceitaListaType = PropTypes.shape({
   description: PropTypes.string.isRequired,
   image: PropTypes.string,
   tempoPreparo: PropTypes.string,
-  dificuldade: PropTypes.oneOf(['Fácil', 'Médio', 'Difícil'])
+  dificuldade: PropTypes.oneOf(['Fácil', 'Médio', 'Difícil']),
 });
 
 // Definição de tipos para usuário
@@ -42,8 +42,8 @@ export const UsuarioType = PropTypes.shape({
   photoURL: PropTypes.string,
   metadata: PropTypes.shape({
     creationTime: PropTypes.string,
-    lastSignInTime: PropTypes.string
-  })
+    lastSignInTime: PropTypes.string,
+  }),
 });
 
 // Função helper para validar objetos usando PropTypes
@@ -54,17 +54,17 @@ export const validarPropTypes = (data, propType, nomeObjeto = 'objeto') => {
       { [nomeObjeto]: propType },
       { [nomeObjeto]: data },
       'prop',
-      'ValidadorPropTypes'
+      'ValidadorPropTypes',
     );
-    
+
     return {
       valido: resultado === undefined, // PropTypes retorna undefined quando válido
-      erros: resultado ? [resultado] : []
+      erros: resultado ? [resultado] : [],
     };
   } catch (error) {
     return {
       valido: false,
-      erros: [error.message]
+      erros: [error.message],
     };
   }
 };
@@ -76,26 +76,26 @@ export const exemploValidacao = {
     return validarPropTypes(
       ingredientes,
       PropTypes.arrayOf(PropTypes.string).isRequired,
-      'ingredientes'
+      'ingredientes',
     );
   },
-  
+
   // Validar receita completa
   validarReceita: (receita) => {
     return validarPropTypes(receita, ReceitaType, 'receita');
   },
-  
+
   // Validar lista de receitas
   validarListaReceitas: (receitas) => {
     return validarPropTypes(
       receitas,
       PropTypes.arrayOf(ReceitaListaType).isRequired,
-      'receitas'
+      'receitas',
     );
   },
-  
+
   // Validar usuário
   validarUsuario: (usuario) => {
     return validarPropTypes(usuario, UsuarioType, 'usuario');
-  }
+  },
 };
