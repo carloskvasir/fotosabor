@@ -1,4 +1,4 @@
-# 📱 FotoSabor - Aplicativo de Receitas com IA
+# FotoSabor - Aplicativo de Receitas com IA
 
 ![React Native](https://img.shields.io/badge/React%20Native-0.79.2-blue.svg)
 ![Expo](https://img.shields.io/badge/Expo-~53.0.9-black.svg)
@@ -23,11 +23,9 @@ Um aplicativo React Native que utiliza Inteligência Artificial para detectar in
 - [🚀 Deploy e Distribuição](#-deploy-e-distribuição)
 - [🔧 Troubleshooting](#-troubleshooting)
 - [⚡ Performance e Otimizações](#-performance-e-otimizações)
-- [🗺️ Roadmap e Funcionalidades Futuras](#️-roadmap-e-funcionalidades-futuras)
-- [📚 Documentação Adicional](#-documentação-adicional)
 - [🤝 Contribuição](#-contribuição)
 - [📜 Licença](#-licença)
-- [👨‍💻 Autor](#-autor)
+- [👨‍💻 Autores](#-autores)
 - [🙏 Agradecimentos](#-agradecimentos)
 
 ## 🎯 Sobre o Projeto
@@ -393,28 +391,6 @@ export const APP_CONFIG = {
 };
 ```
 
-## 🗺️ Roadmap e Funcionalidades Futuras
-
-### 🚧 Em Desenvolvimento
-- [ ] **Modo Offline**: Cache de receitas para uso sem internet
-- [ ] **Compartilhamento**: Compartilhar receitas via redes sociais
-- [ ] **Lista de Compras**: Gerar lista automaticamente dos ingredientes
-- [ ] **Notificações Push**: Lembretes de receitas e novidades
-- [ ] **Dark Mode**: Tema escuro para melhor experiência noturna
-
-### 💡 Ideias Futuras
-- [ ] **Reconhecimento de Voz**: Comando por voz para navegação
-- [ ] **AR**: Realidade aumentada para sobreposição de instruções
-- [ ] **Social**: Sistema de seguir outros usuários e suas receitas
-- [ ] **Machine Learning**: Sugestões personalizadas baseadas no histórico
-- [ ] **Integração**: APIs de supermercados para preços de ingredientes
-
-### 🎯 Versões Planejadas
-- **v1.1**: Modo offline e compartilhamento
-- **v1.2**: Lista de compras inteligente
-- **v2.0**: Features sociais e AR
-- **v2.1**: ML personalizado
-
 ### 🔗 Links Úteis
 - [Documentação do React Native](https://reactnative.dev/docs/getting-started)
 - [Documentação do Expo](https://docs.expo.dev/)
@@ -432,6 +408,11 @@ Este é um projeto acadêmico, mas contribuições são bem-vindas para fins edu
 3. **Commit** suas mudanças (`git commit -m 'Add some AmazingFeature'`)
 4. **Push** para a branch (`git push origin feature/AmazingFeature`)
 5. **Abra um Pull Request**
+
+### 🧪 Executando Testes
+```bash
+# Verificar qualidade do código
+npm run lint
 
 # Corrigir problemas automaticamente
 npm run lint:fix
@@ -455,7 +436,53 @@ Este projeto foi desenvolvido para fins **acadêmicos e educacionais**.
 - ❌ Uso comercial sem autorização
 - ❌ Redistribuição sem créditos
 
+### 📝 Citação Acadêmica
+```
+FotoSabor - Aplicativo de Receitas com IA
+Autores: Carlos Kvasir e David Marlon
+Ano: 2025
+Tecnologias: React Native, Firebase, Google Gemini AI
+```
 
+## 👨‍💻 Autores
+
+### **Carlos Kvasir** - Desenvolvedor Full-Stack
+- 💼 LinkedIn: [Carlos Kvasir](https://www.linkedin.com/in/carloskvasir/)
+- 🌟 GitHub: [@carloskvasir](https://github.com/carloskvasir)
+
+### **David Marlon** - Desenvolvedor Mobile
+- 💼 LinkedIn: [David Marlon](https://www.linkedin.com/in/davidmarlonpereira/)
+- 🌟 GitHub: [@davidmarlon](https://github.com/MP-David)
+
+### 🎯 Projeto Acadêmico
+- 🏫 Instituição: UTFPR-DV - Universidade Tecnológica Federal do Paraná
+- 📅 Período: 5/8
+- 🎓 Curso: Engenharia de Software
+
+### 🏆 Objetivos Acadêmicos Alcançados
+- ✅ Desenvolvimento de aplicativo móvel multiplataforma
+- ✅ Integração com APIs externas (Firebase, Gemini AI)
+- ✅ Implementação de autenticação e banco de dados
+- ✅ Aplicação de boas práticas de código (ESLint, arquitetura limpa)
+- ✅ Criação de interface de usuário moderna e responsiva
+- ✅ Documentação técnica completa e profissional
+
+## 🙏 Agradecimentos
+
+### 🌟 Tecnologias e Serviços
+- **[Google Gemini AI](https://ai.google.dev/)** - Análise de imagens e geração de receitas inteligente
+- **[Firebase](https://firebase.google.com/)** - Backend as a Service completo e confiável
+- **[Expo](https://expo.dev/)** - Plataforma de desenvolvimento React Native simplificada
+- **[React Native Community](https://reactnative.dev/community/overview)** - Ecossistema rico em componentes e bibliotecas
+
+### 💡 Conceitos Aplicados
+- **Engenharia de Software**: Arquitetura limpa e padrões de projeto
+- **Banco de Dados**: Modelagem NoSQL e consultas otimizadas  
+- **Inteligência Artificial**: Integração com APIs de ML/AI
+- **Interface Humano-Computador**: UX/UI responsivo e intuitivo
+- **Desenvolvimento Mobile**: Conceitos de aplicações nativas e híbridas
+
+---
 
 <div align="center">
 
