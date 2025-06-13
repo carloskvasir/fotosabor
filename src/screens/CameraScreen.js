@@ -19,6 +19,7 @@ import {
 import { Icon } from 'react-native-elements';
 
 import BottomNavigation from '../components/BottomNavigation';
+import { APP_CONFIG, ERROR_MESSAGES } from '../config/constants';
 import { PROMPTS } from '../config/geminiPrompts';
 import { analyzeImage, generateBannerRecipe } from '../services/geminiService';
 
@@ -38,7 +39,7 @@ const CameraScreen = ({ navigation }) => {
       if (Platform.OS !== 'web') {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('Permissão necessária', 'Precisamos de permissão para acessar sua câmera');
+          Alert.alert('Permissão necessária', ERROR_MESSAGES.NO_CAMERA_PERMISSION);
         }
       }
     })();
@@ -56,8 +57,8 @@ const CameraScreen = ({ navigation }) => {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
+        aspect: APP_CONFIG.IMAGE_ASPECT_RATIO,
+        quality: APP_CONFIG.IMAGE_QUALITY,
       });
 
       if (!result.canceled && result.assets && result.assets[0].uri) {
@@ -65,7 +66,7 @@ const CameraScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.log('Erro ao abrir câmera:', error);
-      Alert.alert('Erro', 'Não foi possível acessar a câmera');
+      Alert.alert('Erro', ERROR_MESSAGES.CAMERA_ACCESS_FAILED);
     }
   };
 
@@ -81,8 +82,8 @@ const CameraScreen = ({ navigation }) => {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [4, 3],
-        quality: 0.8,
+        aspect: APP_CONFIG.IMAGE_ASPECT_RATIO,
+        quality: APP_CONFIG.IMAGE_QUALITY,
       });
 
       if (!result.canceled && result.assets && result.assets[0].uri) {
@@ -90,7 +91,7 @@ const CameraScreen = ({ navigation }) => {
       }
     } catch (error) {
       console.log('Erro ao abrir galeria:', error);
-      Alert.alert('Erro', 'Não foi possível acessar suas fotos');
+      Alert.alert('Erro', ERROR_MESSAGES.GALLERY_ACCESS_FAILED);
     }
   };
 
@@ -274,19 +275,24 @@ const CameraScreen = ({ navigation }) => {
     const trimmedIngredient = newIngredient.trim();
 
     if (!trimmedIngredient) {
-      Alert.alert('Atenção', 'Digite um ingrediente válido.');
+      Alert.alert('Atenção', ERROR_MESSAGES.INGREDIENT_REQUIRED);
       return;
     }
 
-    if (trimmedIngredient.length < 2) {
-      Alert.alert('Atenção', 'O ingrediente deve ter pelo menos 2 caracteres.');
+    if (trimmedIngredient.length < APP_CONFIG.MIN_INGREDIENT_NAME_LENGTH) {
+      Alert.alert('Atenção', ERROR_MESSAGES.INGREDIENT_TOO_SHORT);
+      return;
+    }
+
+    if (trimmedIngredient.length > APP_CONFIG.MAX_INGREDIENT_NAME_LENGTH) {
+      Alert.alert('Atenção', `O ingrediente não pode ter mais de ${APP_CONFIG.MAX_INGREDIENT_NAME_LENGTH} caracteres.`);
       return;
     }
 
     if (editableIngredients.some(ingredient =>
       ingredient.toLowerCase() === trimmedIngredient.toLowerCase(),
     )) {
-      Alert.alert('Atenção', 'Este ingrediente já foi adicionado.');
+      Alert.alert('Atenção', ERROR_MESSAGES.INGREDIENT_ALREADY_EXISTS);
       return;
     }
 

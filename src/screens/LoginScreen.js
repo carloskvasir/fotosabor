@@ -2,6 +2,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import { Alert, Button, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { auth } from '../config/firebaseConfig';
+import { isValidEmail } from '../utils/helpers';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -11,6 +12,11 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      Alert.alert('Erro', 'Por favor, insira um email válido');
       return;
     }
 

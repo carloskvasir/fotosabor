@@ -1,6 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Icon } from 'react-native-elements';
+import { COLORS } from '../config/constants';
+import { formatIngredients, formatCookingTime } from '../utils/helpers';
 
 const ModernRecipeCard = ({
   item,
@@ -13,7 +15,7 @@ const ModernRecipeCard = ({
   // Suporte a ambos os formatos de dados
   const name = item.name || item.title || 'Receita sem nome';
   const description = item.description || 'Sem descrição';
-  const ingredients = item.ingredients || item.ingredientes || [];
+  const ingredients = formatIngredients(item.ingredients || item.ingredientes || []);
   const estimatedTime = item.estimatedTime || item.preparationTime || null;
   const difficulty = item.difficulty || null;
   const servings = item.servings || null;
@@ -28,7 +30,7 @@ const ModernRecipeCard = ({
           {ingredients.slice(0, 3).map((ingredient, idx) => (
             <View key={idx} style={styles.ingredientTag}>
               <Text style={styles.ingredientTagText}>
-                {typeof ingredient === 'string' ? ingredient : ingredient.name || ingredient}
+                {ingredient}
               </Text>
             </View>
           ))}
@@ -44,7 +46,12 @@ const ModernRecipeCard = ({
 
   const renderInfoTags = () => {
     const infos = [];
-    if (estimatedTime) infos.push({ icon: 'clock', text: estimatedTime, color: '#3498db' });
+    if (estimatedTime) {
+      const timeText = typeof estimatedTime === 'number'
+        ? formatCookingTime(estimatedTime)
+        : estimatedTime;
+      infos.push({ icon: 'clock', text: timeText, color: '#3498db' });
+    }
     if (servings) infos.push({ icon: 'users', text: servings, color: '#e67e22' });
     if (difficulty) infos.push({ icon: 'trending-up', text: difficulty, color: '#9b59b6' });
 
@@ -168,12 +175,12 @@ const styles = StyleSheet.create({
   recipeTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   recipeDescription: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.text.secondary,
     lineHeight: 20,
     marginBottom: 8,
   },

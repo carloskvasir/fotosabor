@@ -12,7 +12,9 @@ import {
 import { Icon, Text } from 'react-native-elements';
 import BottomNavigation from '../components/BottomNavigation';
 import { auth } from '../config/firebaseConfig';
+import { COLORS } from '../config/constants';
 import { addToFavorites, isFavorite, removeFromFavorites, saveBannerRecipe, saveFullRecipe } from '../services/firestoreService';
+import { formatCookingTime, generateRecipeId } from '../utils/helpers';
 
 export default function RecipeDetailsScreen({ route, navigation }) {
   const { recipe, originalImage, detectedIngredients } = route.params;
@@ -43,12 +45,7 @@ export default function RecipeDetailsScreen({ route, navigation }) {
 
     // Garantir que a receita tenha um ID único e consistente
     if (!recipeToSave.id) {
-      const timestamp = Date.now();
-      const cleanName = recipeToSave.name?.toLowerCase()
-        .replace(/[^a-zA-Z0-9\s]/g, '') // Remove caracteres especiais
-        .replace(/\s+/g, '-') // Substitui espaços por hífens
-        .substring(0, 30); // Limita a 30 caracteres
-      recipeToSave.id = `${cleanName}-${timestamp}`;
+      recipeToSave.id = generateRecipeId(recipeToSave.name);
     }
 
     console.log('🔍 Debug - ID da receita:', recipeToSave.id);
@@ -236,7 +233,11 @@ export default function RecipeDetailsScreen({ route, navigation }) {
               {recipe.preparationTime && (
                 <View style={styles.infoItem}>
                   <Icon name="clock" type="feather" size={20} color="#3498db" />
-                  <Text style={styles.infoText}>{recipe.preparationTime}</Text>
+                  <Text style={styles.infoText}>
+                    {typeof recipe.preparationTime === 'number'
+                      ? formatCookingTime(recipe.preparationTime)
+                      : recipe.preparationTime}
+                  </Text>
                 </View>
               )}
               {recipe.servings && (
@@ -266,7 +267,7 @@ export default function RecipeDetailsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: COLORS.background,
   },
   header: {
     flexDirection: 'row',
@@ -274,9 +275,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     height: 60,
-    backgroundColor: '#ffffff',
+    backgroundColor: COLORS.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#e1e4e8',
+    borderBottomColor: COLORS.border,
   },
   backButton: {
     padding: 8,
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.text.primary,
   },
   favoriteButton: {
     padding: 8,
